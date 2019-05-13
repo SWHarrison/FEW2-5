@@ -1,0 +1,338 @@
+<div id="container" style="display: flex; flex-direction: row; align-items: flex-end; height: 500px"></div>
+<div>
+    <button id="male-button">Males</button>
+    <button id="female-button">Females</button>
+
+    <button id="survivor-button">Survivors</button>
+    <button id="dier-button">Diers</button>
+
+    <button id="fare-button" style = "background-color: #000; color: #fff">Fare</button>
+    <button id="age-button">Age</button>
+</div>
+<script>
+
+  function selectButton(button, state) {
+
+    if (state) {
+        button.style.backgroundColor = '#000'
+        button.style.color = '#fff'
+    } else {
+        button.style.backgroundColor = '#fff'
+        button.style.color = '#000'
+    }
+  }
+
+  const maleButton = document.getElementById('male-button')
+  const femaleButton = document.getElementById('female-button')
+  const survivorButton = document.getElementById('survivor-button')
+  const dierButton = document.getElementById('dier-button')
+  const fareButton = document.getElementById('fare-button')
+  const ageButton = document.getElementById('age-button')
+
+  const contain = document.getElementById('container')
+
+  let maleButtonState = false
+  let femaleButtonState = false
+
+  let survivorButtonState = false
+  let dierButtonState = false
+
+  let fareButtonState = true
+
+  let sortByAge = true
+
+  /*
+  * if male and !female then becomes none
+  * if male and female then becomes only female
+  * if !male and !female then becomes only male
+  * if !male and female then becomes both
+  */
+
+  maleButton.addEventListener('click', (e) => {
+    maleButtonState = !maleButtonState // change the state
+    selectButton(maleButton, maleButtonState) // change the appearnace
+    // do some other code...
+    let hasMale = valueArr.includes("male")
+    let hasFemale = valueArr.includes("female")
+    let hasNone = valueArr.includes("NONE")
+    console.log(hasMale)
+    console.log(hasFemale)
+    if (hasMale && !hasFemale) {
+      fieldArr.splice( fieldArr.indexOf('sex'), 1 )
+      valueArr.splice( valueArr.indexOf('male'), 1 )
+      valueArr.push("NONE")
+      fieldArr.push("sex")
+    } else if (!hasMale && !hasFemale && !hasNone) {
+      valueArr.push("female")
+      fieldArr.push("sex")
+    } else if (hasNone) {
+      fieldArr.splice( fieldArr.indexOf('sex'), 1 )
+      valueArr.splice( valueArr.indexOf('NONE'), 1 )
+      valueArr.push("male")
+      fieldArr.push("sex")
+    } else {
+      fieldArr.splice( fieldArr.indexOf('sex'), 1 )
+      valueArr.splice( valueArr.indexOf('female'), 1 )
+    }
+
+    console.log(fieldArr)
+    console.log(valueArr)
+    contain.innerHTML = ''
+    handleData(data)
+  })
+
+  /*
+  * if male and !female then becomes both
+  * if male and female then becomes only male
+  * if !male and !female then becomes only female
+  * if !male and female then becomes none
+  */
+  femaleButton.addEventListener('click', (e) => {
+    femaleButtonState = !femaleButtonState // change the state
+    selectButton(femaleButton, femaleButtonState) // change the appearnace
+    // do some other code...
+    let hasMale = valueArr.includes("male")
+    let hasFemale = valueArr.includes("female")
+    let hasNone = valueArr.includes("NONE")
+    console.log(hasMale)
+    console.log(hasFemale)
+    if (hasMale && !hasFemale) {
+      fieldArr.splice( fieldArr.indexOf('sex'), 1 )
+      valueArr.splice( valueArr.indexOf('male'), 1 )
+    } else if (!hasMale && !hasFemale && !hasNone) {
+      valueArr.push("male")
+      fieldArr.push("sex")
+    } else if (hasNone) {
+      fieldArr.splice( fieldArr.indexOf('sex'), 1 )
+      valueArr.splice( valueArr.indexOf('NONE'), 1 )
+      valueArr.push("female")
+      fieldArr.push("sex")
+    } else {
+      fieldArr.splice( fieldArr.indexOf('sex'), 1 )
+      valueArr.splice( valueArr.indexOf('female'), 1 )
+      valueArr.push("NONE")
+      fieldArr.push("sex")
+    }
+
+    console.log(fieldArr)
+    console.log(valueArr)
+    contain.innerHTML = '';
+    handleData(data)
+  })
+
+  dierButton.addEventListener('click', (e) => {
+    dierButtonState = !dierButtonState // change the state
+    selectButton(dierButton, dierButtonState) // change the appearnace
+    // do some other code...
+    let hasSurvived = valueArr.includes("Yes")
+    let hasDied = valueArr.includes("No")
+    let hasNone = valueArr.includes("none")
+    console.log(hasSurvived)
+    console.log(hasDied)
+    if (hasSurvived && !hasDied) {
+      fieldArr.splice( fieldArr.indexOf('survived'), 1 )
+      valueArr.splice( valueArr.indexOf('Yes'), 1 )
+    } else if (!hasSurvived && !hasDied && !hasNone) {
+      valueArr.push("Yes")
+      fieldArr.push("survived")
+    } else if (hasNone) {
+      fieldArr.splice( fieldArr.indexOf('survived'), 1 )
+      valueArr.splice( valueArr.indexOf('none'), 1 )
+      valueArr.push("No")
+      fieldArr.push("survived")
+    } else {
+      fieldArr.splice( fieldArr.indexOf('survived'), 1 )
+      valueArr.splice( valueArr.indexOf('No'), 1 )
+      valueArr.push("none")
+      fieldArr.push("survived")
+    }
+
+    console.log(fieldArr)
+    console.log(valueArr)
+    contain.innerHTML = '';
+    handleData(data)
+  })
+
+  survivorButton.addEventListener('click', (e) => {
+    survivorButtonState = !survivorButtonState // change the state
+    selectButton(survivorButton, survivorButtonState) // change the appearnace
+    // do some other code...
+    let hasSurvived = valueArr.includes("Yes")
+    let hasDied= valueArr.includes("No")
+    let hasNone = valueArr.includes("none")
+    console.log(hasSurvived)
+    console.log(hasDied)
+    if (hasSurvived && !hasDied) {
+      fieldArr.splice( fieldArr.indexOf('survived'), 1 )
+      valueArr.splice( valueArr.indexOf('Yes'), 1 )
+      valueArr.push("none")
+      fieldArr.push("survived")
+    } else if (!hasSurvived && !hasDied && !hasNone) {
+      valueArr.push("No")
+      fieldArr.push("survived")
+    } else if (hasNone) {
+      fieldArr.splice( fieldArr.indexOf('survived'), 1 )
+      valueArr.splice( valueArr.indexOf('none'), 1 )
+      valueArr.push("Yes")
+      fieldArr.push("survived")
+    } else {
+      fieldArr.splice( fieldArr.indexOf('survived'), 1 )
+      valueArr.splice( valueArr.indexOf('No'), 1 )
+    }
+
+    console.log(fieldArr)
+    console.log(valueArr)
+    contain.innerHTML = ''
+    handleData(data)
+  })
+
+  fareButton.addEventListener('click', (e) => {
+    fareButtonState = !fareButtonState // change the state
+    selectButton(fareButton, fareButtonState) // change the appearnace
+    selectButton(ageButton, !fareButtonState)
+    // do some other code...
+    if (fareButtonState) {
+      height = "fare"
+    } else {
+      height = "age"
+    }
+
+    contain.innerHTML = ''
+    handleData(data)
+  })
+
+  ageButton.addEventListener('click', (e) => {
+    fareButtonState = !fareButtonState // change the state
+    selectButton(fareButton, fareButtonState) // change the appearnace
+    selectButton(ageButton, !fareButtonState)
+    // do some other code...
+    if (fareButtonState) {
+      height = "fare"
+    } else {
+      height = "age"
+    }
+
+    contain.innerHTML = ''
+    handleData(data)
+  })
+
+  var fieldArr = ["survived", "sex"]
+  var valueArr = ["none", "NONE"]
+  var height = "fare"
+  var data;
+
+  fetch('titanic-passengers.json')
+  .then(res => res.json())
+  .then(json => {
+    data = json
+    handleData(data)
+  })
+  .catch(err => console.log(err.message))
+
+  function filterByField(item) {
+
+    // console.log(item)
+    noFalse = true
+    for(value in fieldArr){
+      if (!(item.fields[fieldArr[value]] === valueArr[value])) {
+        noFalse = false
+      }
+    }
+
+    return noFalse
+  }
+
+  function handleData(data){
+
+    const passengers = data.filter(passenger => filterByField(passenger) && passenger.fields[height])
+    const maxHeightValue = passengers.reduce((acc, passenger) => {
+    if (!passenger.fields[height]) return acc
+      return Math.max(acc, Number(passenger.fields[height]))
+    }, 0)
+
+    passengers.sort(function(a, b) {
+      //console.log(parseInt(a[height]) - parseInt(b[height]))
+      if(a.fields[height] && b.fields[height]){
+        return a.fields[height] - b.fields[height];
+      }
+      return 0
+    });
+
+
+
+    console.log(passengers)
+    passengers.sort();
+    console.log(passengers)
+
+    for(let item in passengers){
+      //console.log(passengers[item].fields[height])
+      const el = document.createElement('div')
+      el.style.height = (passengers[item].fields[height]/maxHeightValue)*100 + "%"
+      el.style.width = (1440/passengers.length)+'px'
+      el.style.backgroundColor = '#0ff'
+      // el.style.margin = '1px'
+      if(passengers[item].fields.sex == "male"){
+
+        if(passengers[item].fields.survived == "Yes"){
+          el.style.backgroundColor = '#00f'
+        } else {
+          el.style.backgroundColor = '#005'
+        }
+
+      } else {
+        if(passengers[item].fields.survived == "Yes"){
+          el.style.backgroundColor = 'pink'
+        } else {
+          el.style.backgroundColor = 'red'
+        }
+      }
+      contain.appendChild(el)
+    }
+  }
+
+  /*<div style="width:500px;height:100px;border:1px solid #000;">This is a rectangle!</div>*/
+
+  function countField(data, field, value) {
+    return data.reduce((acc, passenger) => {
+      if (passenger.fields[field] === value) {
+        return acc += 1
+      }
+      return acc
+    }, 0)
+  }
+
+  function countManyField(data, fieldArr, valueArr) {
+    return data.reduce((acc, passenger) => {
+
+      noFalse = true
+      for(value in fieldArr){
+        if (!(passenger.fields[fieldArr[value]] === valueArr[value])) {
+          noFalse = false
+        }
+      }
+
+      if(noFalse){
+        return acc += 1
+      }
+      return acc
+    }, 0)
+  }
+
+
+  /*const totalFares = data.reduce((acc, passenger) => {
+    return acc + passenger.fields.fare
+  } , 0)
+  console.log("Total fair:" + totalFares)
+
+  const survivingMales = data.reduce((acc, passenger) => {
+    if(passenger.fields.sex === "female" && passenger.fields.survived === "Yes"){
+      acc += 1
+    }
+
+    return acc
+  } , 0)
+  console.log("Surviving Men " + survivingMales)
+
+  const maleSurviving = countManyField(data,["sex","survived","pclass"], ["male","Yes",3])
+  console.log(maleSurviving)*/
+</script>

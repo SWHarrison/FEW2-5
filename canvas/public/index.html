@@ -1,0 +1,259 @@
+<canvas id="canvas" width="600" height="600"></canvas>
+<div style="display: flex; flex-direction: row; align-items: flex-start; padding: 20px;"">
+  <button class="filter-button-group" data-name="survived">Survived</button>
+  <button class="filter-button-group" data-name="sex">Sex</button>
+  <button class="filter-button-group" data-name="embarked">Port Embarked</button>
+  <button class="filter-button-group" data-name="Pclass">Passenger Class</button>
+</div>
+<div id="container" style="display: flex; flex-direction: column; align-items: flex-start; height: 500px; width: 600px">
+
+
+<script>
+
+  var data
+  fetch('titanic-passengers.json')
+  .then(res => res.json())
+  .then(json => {
+    data = json
+    makeGroup(buttons)
+  })
+  .catch(err => console.log(err.message))
+
+  const canvas = document.getElementById('canvas');
+  const contain = document.getElementById('container')
+  const ctx = canvas.getContext('2d');
+  const filterCategories = ["survived","sex","embarked","pclass"]
+  const filterValues = [["Yes","No"],["male","female"],["S","C","Q"],["1","2","3"]]
+  const buttons = document.querySelectorAll('.filter-button-group')
+  let filterStates = [false,false,false,false]
+
+  // Unused filters, later changed by makeFilters function
+  var filters = [
+  [["sex","survived"],["male","Yes"]],
+  [["sex","survived"], ["female","Yes"]],
+  [["sex","survived"], ["male","No"]],
+  [["sex","survived"], ["female","No"]]
+  ]
+
+  function makeGroup(buttons) {
+    buttons.forEach((button) => {
+      button.addEventListener('click', (e) => {
+        let i = 0
+        buttons.forEach((b) => {
+          if (b === button) {
+            selectButton(b, i)
+          }
+          i++
+        })
+      })
+    })
+  }
+
+  function selectButton(button, i) {
+    filterStates[i] = !filterStates[i]
+
+    state = filterStates[i]
+
+    if (state) {
+        button.style.backgroundColor = '#000'
+        button.style.color = '#fff'
+    } else {
+        button.style.backgroundColor = '#fff'
+        button.style.color = '#000'
+    }
+
+    contain.innerHTML = ''
+    handleData(data)
+  }
+
+  function createFilters(){
+
+    console.log(filterStates)
+    let typesFiltered = 0
+    let numFilters = 1
+    let currentFilterCat = filterCategories.slice(0,4)
+    let currentFilterValues = filterValues.slice(0,4)
+    console.log("before removal")
+    console.log(currentFilterCat)
+    console.log(currentFilterValues)
+
+    // Removes unused filters based on button states
+    if(filterStates[0]){
+      numFilters *= 2
+      typesFiltered += 1
+    } else {
+      currentFilterCat.splice(typesFiltered, 1)
+      currentFilterValues.splice(typesFiltered, 1)
+    }
+    if(filterStates[1]){
+      numFilters *= 2
+      typesFiltered += 1
+    } else {
+      currentFilterCat.splice(typesFiltered, 1)
+      currentFilterValues.splice(typesFiltered, 1)
+    }
+    if(filterStates[2]){
+      numFilters *= 3
+      typesFiltered += 1
+    } else {
+      currentFilterCat.splice(typesFiltered, 1)
+      currentFilterValues.splice(typesFiltered, 1)
+    }
+    if(filterStates[3]){
+      numFilters *= 3
+      typesFiltered += 1
+    } else {
+      currentFilterCat.splice(typesFiltered, 1)
+      currentFilterValues.splice(typesFiltered, 1)
+    }
+
+    console.log(filterStates)
+    console.log(currentFilterCat)
+    console.log(currentFilterValues)
+
+    // If no filters, return empty filter array
+    if (typesFiltered == 0){
+      return []
+    }
+
+    console.log("filter creation")
+    // Creates list of all filters
+    to_return = []
+    for (let i = 0; i < currentFilterValues[0].length; i += 1){
+      to_return.push([currentFilterValues[0][i]])
+    }
+
+    console.log(to_return)
+
+    for (let i = 1; i < currentFilterValues.length; i += 1){
+
+      to_add = []
+
+      for (let j = 0; j < to_return.length * currentFilterValues[i].length; j += 1){
+        to_add.push(to_return[j%to_return.length].slice())
+      }
+
+      // console.log("to add before adding")
+      // console.log(to_add)
+
+      for (let j = 0; j < to_add.length; j += 1){
+
+        index = Math.floor(j / (Math.floor(to_add.length / currentFilterValues[i].length)))
+        new_value = currentFilterValues[i][index]
+        to_add[j].push(new_value)
+      }
+
+      to_return = to_add.slice()
+    }
+    // console.log("returning")
+    to_return.push(currentFilterCat)
+    return to_return
+  }
+
+  function handleData(data){
+
+    filters = createFilters()
+    console.log(filters)
+    let circleData = []
+
+    const el = document.createElement('p')
+    el.innerHTML = 'Current Filter Categories: ' + filters[filters.length-1]
+    contain.appendChild(el)
+
+    for (let i = 0; i < filters.length - 1; i += 1){
+      //console.log(val[0])
+      //console.log(val[1])
+      newData = countManyField(data,filters[filters.length-1],filters[i])
+      //console.log(newData)
+      circleData.push(newData)
+      console.log(filters.length)
+      console.log(i)
+      const hue = 360 / (filters.length - 1) * i
+      //console.log(hue)
+      const el = document.createElement('p')
+      el.style.color = `hsl(${hue}, 100%, 50%)`
+      el.innerHTML = filters[i]
+      contain.appendChild(el)
+    }
+
+    if(circleData.length > 0){
+      drawCircle(300,300,100,circleData)
+    }
+  }
+
+  function countField(data, field, value) {
+    return data.reduce((acc, passenger) => {
+      if (passenger.fields[field] === value) {
+        return acc += 1
+      }
+      return acc
+    }, 0)
+  }
+
+  function countManyField(data, fieldArr, valueArr) {
+    return data.reduce((acc, passenger) => {
+
+      noFalse = true
+      for(value in fieldArr){
+        if (!(passenger.fields[fieldArr[value]] == valueArr[value])) {
+          noFalse = false
+        }
+      }
+
+      if(noFalse){
+        return acc += 1
+      }
+      return acc
+    }, 0)
+  }
+
+  function drawCircle(x, y, radius, arr) {
+
+    const max = arr.reduce((a, v) => a + v)
+
+    let lastAngle = 0
+    arr.forEach((val, i) => {
+      const endAngle = 2 * Math.PI * val / max
+      ctx.beginPath()
+      ctx.arc(x, y, radius, lastAngle, lastAngle + endAngle)
+      ctx.lineWidth = radius * 2
+      const hue = 360 / arr.length * i
+      console.log(hue)
+      ctx.strokeStyle = `hsl(${hue}, 100%, 50%)`
+      ctx.stroke()
+      lastAngle += endAngle
+    })
+  }
+
+  // Old code for filters function
+  /*newFilters = new Set()
+  for(i in filterValues[0]){
+    for(j in filterValues[1]){
+      for(k in filterValues[2]){
+        for(l in filterValues[3]){
+          toAppend = [[],[]]
+          if(filterSurvived){
+            toAppend[0].push(filterCategories[0])
+            toAppend[1].push(filterValues[0][i])
+          }
+          if(filterSex){
+            toAppend[0].push(filterCategories[1])
+            toAppend[1].push(filterValues[1][j])
+          }
+          if(filterEmbark){
+            toAppend[0].push(filterCategories[2])
+            toAppend[1].push(filterValues[2][k])
+          }
+          if(filterPClass){
+            toAppend[0].push(filterCategories[3])
+            toAppend[1].push(filterValues[3][l])
+          }
+
+          newFilters.add(toAppend)
+        }
+      }
+    }
+  }
+
+  return newFilters*/
+</script>

@@ -1,0 +1,194 @@
+<div style = "width:1200px; height:600px;"><canvas id="canvas"></canvas></div>
+<div style = "width:1200px; height:600px;"><canvas id="canvas2"></canvas></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script>
+  fetch('titanic-passengers.json')
+  .then(res => res.json())
+  .then(json => {
+    data = json
+    handleData(data)
+  })
+  .catch(err => console.log(err.message))
+
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const canvas2 = document.getElementById('canvas2');
+  const ctx2 = canvas2.getContext('2d');
+
+  var filters = [
+  [["sex","survived"],["male","Yes"]],
+  [["sex","survived"], ["female","Yes"]],
+  [["sex","survived"], ["male","No"]],
+  [["sex","survived"], ["female","No"]]
+  ]
+
+  function handleData(data){
+
+    // console.log(filters)
+    let radarData = []
+    let radarData2 = []
+    radarData.push(countSurvivorsWithField(data,"sex","female")/countField(data,"sex","female"))
+    radarData.push(countSurvivorsWithField(data,"sex","male")/countField(data,"sex","male"))
+    radarData.push(countSurvivorsWithField(data,"pclass","1")/countField(data,"pclass","1"))
+    radarData.push(countSurvivorsWithField(data,"pclass","2")/countField(data,"pclass","2"))
+    radarData.push(countSurvivorsWithField(data,"pclass","3")/countField(data,"pclass","3"))
+    radarData2.push(countDiersWithField(data,"sex","female")/countField(data,"sex","female"))
+    radarData2.push(countDiersWithField(data,"sex","male")/countField(data,"sex","male"))
+    radarData2.push(countDiersWithField(data,"pclass","1")/countField(data,"pclass","1"))
+    radarData2.push(countDiersWithField(data,"pclass","2")/countField(data,"pclass","2"))
+    radarData2.push(countDiersWithField(data,"pclass","3")/countField(data,"pclass","3"))
+
+    let bubbleData = []
+    for (let i = 0 ; i < data.length - 1; i++){
+      let datapoint = []
+      console.log(data[i].fields)
+      if(data[i].fields && data[i].fields.fare && data[i].fields.age && data[i].fields.pclass){
+        // console.log("added " + i)
+        bubbleData.push({
+          x: data[i].fields.fare,
+          y: data[i].fields.age,
+          r: (4 - data[i].fields.pclass) * 3
+        })
+      }
+    }
+
+    // console.log(data.length)
+//
+// new Chart(document.getElementById("chartjs-6"),{
+//   "type":"bubble",
+//   "data":{"datasets":[
+//     {
+//       "label":"First Dataset",
+//       "data":[
+//         {"x":20,"y":30,"r":15},
+//         {"x":40,"y":10,"r":10}
+//       ],"backgroundColor":"rgb(255, 99, 132)"}]}});
+
+
+
+
+
+
+
+
+
+    console.log(bubbleData)
+
+
+
+
+    let options = {
+      scale: {
+          display: true
+      }
+    };
+    var myRadarChart = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: ['female', 'male', 'First Class', 'Second Class', 'Third Class'],
+        datasets: [{
+          label: "Survivors",
+          data: radarData,
+          backgroundColor : 'rgba(0, 0, 255, 0.2)'
+        },
+        {
+          label: "Diers",
+          data: radarData2,
+          backgroundColor : 'rgba(255, 0, 0, 0.2)'
+        }
+        ]
+      },
+      options: options
+    });
+
+    console.log("showing bubble")
+    var myBubbleChart = new Chart(ctx2, {
+      "type":"bubble",
+      "data":
+        {"datasets":[
+          {
+            "label":"First Dataset",
+            "data": bubbleData,
+            "backgroundColor":"rgba(255, 99, 132, 0.2)"}
+        ]}
+    });
+    console.log("showing bubble2")
+  }
+
+  function countSurvivorsWithField(data, field, value) {
+    return data.reduce((acc, passenger) => {
+      if (passenger.fields[field] == value && passenger.fields["survived"] == "Yes") {
+        return acc += 1
+      }
+      return acc
+    }, 0)
+  }
+
+  function countDiersWithField(data, field, value) {
+    return data.reduce((acc, passenger) => {
+      if (passenger.fields[field] == value && passenger.fields["survived"] == "No") {
+        return acc += 1
+      }
+      return acc
+    }, 0)
+  }
+
+  function countField(data, field, value) {
+    return data.reduce((acc, passenger) => {
+      if (passenger.fields[field] == value) {
+        return acc += 1
+      }
+      return acc
+    }, 0)
+  }
+
+  function countManyField(data, fieldArr, valueArr) {
+    return data.reduce((acc, passenger) => {
+
+      noFalse = true
+      for(value in fieldArr){
+        if (!(passenger.fields[fieldArr[value]] === valueArr[value])) {
+          noFalse = false
+        }
+      }
+
+      if(noFalse){
+        return acc += 1
+      }
+      return acc
+    }, 0)
+  }
+
+  // Old code for filters function
+  /*newFilters = new Set()
+  for(i in filterValues[0]){
+    for(j in filterValues[1]){
+      for(k in filterValues[2]){
+        for(l in filterValues[3]){
+          toAppend = [[],[]]
+          if(filterSurvived){
+            toAppend[0].push(filterCategories[0])
+            toAppend[1].push(filterValues[0][i])
+          }
+          if(filterSex){
+            toAppend[0].push(filterCategories[1])
+            toAppend[1].push(filterValues[1][j])
+          }
+          if(filterEmbark){
+            toAppend[0].push(filterCategories[2])
+            toAppend[1].push(filterValues[2][k])
+          }
+          if(filterPClass){
+            toAppend[0].push(filterCategories[3])
+            toAppend[1].push(filterValues[3][l])
+          }
+
+          newFilters.add(toAppend)
+        }
+      }
+    }
+  }
+
+  return newFilters*/
+</script>
