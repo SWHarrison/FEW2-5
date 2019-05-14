@@ -184,24 +184,19 @@ svg.selectAll("circle")
 });*/
 
 // Modified Legend Code from Mike Bostock: http://bl.ocks.org/mbostock/3888852
-var legend = d3.select("body").append("svg")
+var legend = d3.select("body").select("div")
       			.attr("class", "legend")
-     			.attr("width", 140)
-    			.attr("height", 200)
-   				.selectAll("g")
-   				.data(color.domain().slice().reverse())
-   				.enter()
-   				.append("g")
-     			.attr("transform", function(d, i) { return "translate(0," + i * 20 + ")"; });
-  	legend.append("rect")
-   		  .attr("width", 18)
-   		  .attr("height", 18)
-   		  .style("fill", color);
-  	legend.append("text")
+            .style("opacity", "1")
+    legend.append('div')
+        .attr('class', 'box')
+        .style("width", '180px')
+   		  .style("height", '18px')
+   		  .style("background", `linear-gradient(to right,
+          rgba(50,50,150,1) 0%,
+          rgba(50,50,150,0) 100%)`);
+    legend.append("p")
   		  .data(legendText)
-      	  .attr("x", 24)
-      	  .attr("y", 9)
-      	  .attr("dy", ".35em")
+          .style("margin", "10px")
       	  .text(function(d) { return d; });
 	});
 });
