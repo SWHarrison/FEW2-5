@@ -51,10 +51,10 @@ var categories = ['CENSUS2010POP',
 'POPESTIMATE2010','POPESTIMATE2011','POPESTIMATE2012',
 'POPESTIMATE2013','POPESTIMATE2014','POPESTIMATE2015',
 'POPESTIMATE2016','POPESTIMATE2017','POPESTIMATE2018']
-var category = 0
+var category = 9
 
 //Width and height of map
-var width = 960;
+var width = 840;
 var height = 500;
 // D3 Projection
 var projection = d3.geo.albersUsa()
@@ -67,8 +67,8 @@ var path = d3.geo.path()               // path generator that will convert GeoJS
 
 // Define linear scale for output
 var color = d3.scale.linear()
-			  .range(["rgb(213,222,217)","rgb(69,173,168)","rgb(84,36,55)","rgb(0,91,67)", 'red']);
-var legendText = ["A lot","Population > 10,000,000", "10,000,000 > Population < 5,000,000", "5,000,000 > Population < 1,000,000", "1,000,000 > Population"];
+			  .range(["rgb(213,222,217)"]);
+var legendText = ["50,000,000 > Population > 0"];
 //Create SVG element and append map to the SVG
 var svg = d3.select("body")
 			.append("svg")
@@ -82,7 +82,7 @@ var div = d3.select("body")
     		.style("opacity", 0);
 // Load in my states data!
 d3.csv("nst-est2018-alldata.csv", function(data) {
-color.domain([0,1,2,3,4]); // setting the range of the input data
+color.domain([0]); // setting the range of the input data
 // Load GeoJSON data and merge with states data
 d3.json("us-states.json", function(json) {
 // Loop through each state data value in the .csv file
@@ -138,7 +138,7 @@ svg.selectAll("path")
   	if (value) {
   	  //If value exists…
   	  // return color(value);
-      const blueness = (value / 50000000 * 155) + 100
+      const blueness = (value / 50* 1000 *1000 * 155) + 100
       const alpha = value / 50000000
       console.log(blueness)
       return `rgba(50,50,150,${alpha})`

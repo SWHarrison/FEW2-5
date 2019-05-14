@@ -1,5 +1,6 @@
 <div style = "width:1200px; height:600px;"><canvas id="canvas"></canvas></div>
 <div style = "width:1200px; height:600px;"><canvas id="canvas2"></canvas></div>
+<div style = "width:1200px; height:600px;"><canvas id="canvas3"></canvas></div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
 <script>
@@ -15,6 +16,8 @@
   const ctx = canvas.getContext('2d');
   const canvas2 = document.getElementById('canvas2');
   const ctx2 = canvas2.getContext('2d');
+  const canvas3 = document.getElementById('canvas3');
+  const ctx3 = canvas3.getContext('2d');
 
   var filters = [
   [["sex","survived"],["male","Yes"]],
@@ -42,7 +45,6 @@
     let bubbleData = []
     for (let i = 0 ; i < data.length - 1; i++){
       let datapoint = []
-      console.log(data[i].fields)
       if(data[i].fields && data[i].fields.fare && data[i].fields.age && data[i].fields.pclass){
         // console.log("added " + i)
         bubbleData.push({
@@ -65,22 +67,20 @@
 //         {"x":40,"y":10,"r":10}
 //       ],"backgroundColor":"rgb(255, 99, 132)"}]}});
 
-
-
-
-
-
-
-
-
-    console.log(bubbleData)
-
-
-
-
     let options = {
       scale: {
           display: true
+      }
+    };
+
+    let options2 = {
+      scale: {
+        display: true,
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          }
+        }]
       }
     };
     var myRadarChart = new Chart(ctx, {
@@ -108,12 +108,59 @@
       "data":
         {"datasets":[
           {
-            "label":"First Dataset",
+            "label":"Bubble Dataset",
             "data": bubbleData,
-            "backgroundColor":"rgba(255, 99, 132, 0.2)"}
+            "backgroundColor":"rgba(255, 99, 132, 0.2)"
+          }
         ]}
     });
-    console.log("showing bubble2")
+
+    var myChart = new Chart(ctx3    , {
+    type: 'bar',
+    data: {
+        labels: ["Charts before 5-14-2019", "Charts now"],
+        datasets: [{
+            label: '# of Charts',
+            data: [2, 3],
+            backgroundColor: [
+                'rgba(255, 99, 132, 0.2)',
+                'rgba(54, 162, 235, 0.2)',
+            ],
+            borderColor: [
+                'rgba(255, 99, 132, 1)',
+                'rgba(54, 162, 235, 1)',
+            ],
+            borderWidth: 1
+        }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+    /*var myAmazingStupendousBarChart = new Chart(ctx3, {
+      "type": "bar",
+      "data": {
+        "labels": ["Bar Charts before 5-14-2019", "Bar Charts now"],
+        "datasets":[
+          {
+            "label": "Bar Charts before 5-14-2019",
+            "data" : 2,
+            "backgroundColor":"rgba(255,99,132,0.2)"
+          },
+          {
+            "label": "Bar Charts now",
+            "data" : 3,
+            "backgroundColor":"rgba(132,99,255,0.2)"
+          }]
+      },
+      "options": options2
+    })*/
   }
 
   function countSurvivorsWithField(data, field, value) {
