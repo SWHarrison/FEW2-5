@@ -1,0 +1,224 @@
+<div style = "width:1200px; height:600px;"><canvas id="canvas"></canvas></div>
+<div id = "radio"></div>
+<div style = "width:1200px; height:600px;"><canvas id="canvas2"></canvas></div>
+<div style = "width:1200px; height:600px;"><canvas id="canvas3"></canvas></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+<script>
+  fetch('cereal.json')
+  .then(res => res.json())
+  .then(json => {
+    data = json
+    handleData(data)
+  })
+  .catch(err => console.log(err.message))
+
+  var fiterStates = []
+  var radarData = []
+  var cerealName = "Cocoa Puffs"
+  var myRadarChart
+  const radio = document.getElementById('radio');
+
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+  const canvas2 = document.getElementById('canvas2');
+  const ctx2 = canvas2.getContext('2d');
+  const canvas3 = document.getElementById('canvas3');
+  const ctx3 = canvas3.getContext('2d');
+
+  var buttons;
+
+  function makeGroup(buttons) {
+    buttons.forEach((button) => {
+      button.addEventListener('click', (e) => {
+        let i = 0
+        buttons.forEach((b) => {
+          if (b === button) {
+            selectButton(b, i)
+          } else{
+            deselectButton(b, i)
+          }
+          i++
+        })
+      })
+    })
+  }
+
+  async function selectButton(button, i) {
+    try {
+      filterStates[i] = true
+      button.style.backgroundColor = '#000'
+      button.style.color = '#fff'
+      cerealName = button.value
+      console.log("new cereal name is " + cerealName)
+      radarData = await makeRadarData()
+      console.log("new radar data is " + radarData)
+      myRadarChart.data.datasets[0].data = radarData
+      myRadarChart.update()
+    }
+    catch {
+      console.log("fail")
+    }
+  }
+
+  function deselectButton(button, i) {
+    filterStates[i] = false
+    button.style.backgroundColor = '#fff'
+    button.style.color = '#000'
+  }
+
+  function makeRadarData(){
+    return new Promise(resolve => {
+      let newRadarData = []
+      let radarDataJson;
+      for (let i = 0 ; i < data.length - 1; i++){
+        if (data[i].name == cerealName){
+          radarDataJson = data[i]
+          if(radarDataJson.protein >= 0){
+            newRadarData.push(radarDataJson.protein)
+          }
+          if(radarDataJson.fat >= 0){
+            newRadarData.push(radarDataJson.fat)
+          }
+          if(radarDataJson.fiber >= 0){
+            newRadarData.push(radarDataJson.fiber)
+          }
+          if(radarDataJson.sugars >= 0){
+            newRadarData.push(radarDataJson.sugars)
+          }
+        }
+      }
+      resolve(newRadarData)
+    });
+  }
+
+  async function handleData(data){
+
+    filterStates = []
+    for (let i = 0 ; i < data.length - 1; i++){
+
+      const el = document.createElement('button')
+      if(data[i].name == cerealName){
+        filterStates.push(true)
+        el.style.backgroundColor = '#000'
+        el.style.color = '#fff'
+      } else {
+        filterStates.push(false)
+        el.style.backgroundColor = '#fff'
+        el.style.color = '#000'
+      }
+
+      el.value = data[i].name
+      el.className = "cereal-names"
+      el.innerHTML = data[i].name
+      radio.appendChild(el);
+    }
+
+    buttons = document.querySelectorAll('.cereal-names')
+
+    makeGroup(buttons)
+
+    try{
+      radarData = await makeRadarData()
+    } catch {
+      console.log(fail)
+    }
+
+    let bubbleData = []
+    let labels = []
+    console.log(data)
+    for (let i = 0 ; i < data.length - 1; i++){
+      //console.log(data[i])
+      labels.push(data[i].name)
+      bubbleData.push({
+        x: data[i].calories,
+        y: data[i].sugars / data[i].cups,
+        r: data[i].rating / 5
+      })
+    }
+
+    barData = []
+    barLabels = []
+    barValue = "calories"
+
+    for (let i = 0; i < data.length - 1; i ++){
+      if (data[i][barValue] >= 0){
+        barData.push(data[i][barValue])
+        barLabels.push(data[i].name)
+      }
+    }
+
+    console.log("Bar data below")
+    console.log(barData)
+
+    let options = {
+      scale: {
+          display: true
+      }
+    };
+
+    let options2 = {
+      scale: {
+        display: true,
+        yAxes: [{
+          ticks: {
+            beginAtZero: true
+          }
+        }]
+      }
+    };
+
+    console.log("new radar data is " + radarData)
+    myRadarChart = new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: ['protein', 'fat', 'fiber', 'sugar'],
+        datasets: [{
+          label: "Nutrional Value in Grams of " + cerealName,
+          data: radarData,
+          backgroundColor : 'rgba(0, 0, 255, 0.2)'
+        },
+        ]
+      },
+      options: options
+    });
+
+    var myBubbleChart = new Chart(ctx2, {
+      "type":"bubble",
+      "data":
+        {
+          "labels" : labels,
+          "datasets":
+          [
+            {
+              "label":"Cereal by calories, grams of sugar per cup and rating",
+              "data": bubbleData,
+              "backgroundColor":"rgba(255, 99, 132, 0.2)"
+            }
+          ]
+        },
+    });
+
+    var myChart = new Chart(ctx3    , {
+    type: 'bar',
+    data: {
+        labels: barLabels,
+        datasets: [{
+            label: 'Cereals by ' + barValue,
+            data: barData,
+            borderWidth: 1
+        }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+    });
+  }
+
+</script>
