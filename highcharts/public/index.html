@@ -39,7 +39,7 @@ function gatherData(){
   console.log("TEST 2")
   return new Promise(resolve => {
     console.log("TEST 3")
-    d3.csv("nst-est2018-alldata.csv").then(function(newData){
+    d3.csv("nst-est2018-alldata.csv",function(newData){
       console.log("TEST 4")
       console.log(newData)
     }).then(function(newData){
