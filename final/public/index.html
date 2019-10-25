@@ -54,6 +54,7 @@
       radarData = await makeRadarData()
       console.log("new radar data is " + radarData)
       myRadarChart.data.datasets[0].data = radarData
+      myRadarChart.data.label.data = cerealName
       myRadarChart.update()
     }
     catch {

@@ -1,0 +1,116 @@
+<script src="https://code.highcharts.com/maps/highmaps.js"></script>
+<script src="https://code.highcharts.com/maps/modules/data.js"></script>
+<script src="https://code.highcharts.com/mapdata/countries/us/us-all.js"></script>
+
+<script src="http://d3js.org/d3.v3.min.js"></script>
+
+<div id="container"></div>
+<div id="buttonContainer"></div>
+
+<script>
+
+const graphContainer = document.getElementById('container')
+const buttonContainer = document.getElementById('buttonContainer')
+
+main()
+
+async function main() {
+  console.log("TESTING")
+  const data = await gatherData().catch((err) => { console.error(err); });
+  console.log("TEST")
+  console.log(data)
+
+  for(let year = 0; year < 9; year++) {
+    el = document.createElement("button")
+    el.innerHTML = "POPESTIMATE201" + year
+    el.addEventListener("click", function(){
+      toDisplay = el.innerHTML
+      createGraph()
+    })
+    buttonContainer.appendChild(el)
+  }
+
+  toDisplay = "POPESTIMATE2010"
+
+  createGraph()
+}
+
+function gatherData(){
+  console.log("TEST 2")
+  return new Promise(resolve => {
+    console.log("TEST 3")
+    d3.csv("nst-est2018-alldata.csv"), function(newData){
+      console.log("TEST 4")
+      console.log(newData)
+      resolve(newData)
+    }
+  })
+}
+
+function createGraph(){
+
+  let new_data = []
+  graphContainer.innerHTML = ""
+
+  for(let i = 0; i < data.length; i++){
+    new_data.push({value: data[i][toDisplay], code: data[i].code})
+  }
+
+  console.log(new_data)
+
+  // Instantiate the map
+  Highcharts.mapChart('container', {
+
+    chart: {
+      map: 'countries/us/us-all',
+      borderWidth: 1
+    },
+
+    title: {
+      text: 'US population density (/km²)'
+    },
+
+    exporting: {
+      sourceWidth: 600,
+      sourceHeight: 500
+    },
+    legend: {
+      layout: 'horizontal',
+      borderWidth: 0,
+      backgroundColor: 'rgba(255,255,255,0.85)',
+      floating: true,
+      verticalAlign: 'top',
+      y: 25
+    },
+
+    mapNavigation: {
+      enabled: true
+    },
+
+    colorAxis: {
+      min: 1,
+      max: 50000000,
+      //type: 'logarithmic',
+      minColor: '#EEEEFF',
+      maxColor: '#aaaaaa',
+    },
+
+    series: [{
+      animation: {
+        duration: 1000
+      },
+      data: new_data,
+      joinBy: ['postal-code','code'],
+      dataLabels: {
+        enabled: true,
+        color: '#FFFFFF',
+        format: '{point.code}'
+      },
+      name: 'Population density',
+      tooltip: {
+        pointFormat: '{point.code}: {point.value}'
+      }
+    }]
+  });
+}
+</script>
